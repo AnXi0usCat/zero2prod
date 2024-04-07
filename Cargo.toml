@@ -8,6 +8,9 @@ edition = "2021"
 [lib]
 path = "src/lib.rs"
 
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
 
 [dependencies]
 actix-web = "4"
