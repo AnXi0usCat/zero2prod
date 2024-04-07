@@ -1,11 +1,12 @@
-async fn spawn_app() -> Result<(), std::io::Error> {
-    zero2prod::run().await
+fn spawn_app() {
+    let server = zero2prod::run().expect("Failed to  bind address.");
+    let _ = tokio::spawn(server);
 }
 
 #[tokio::test]
 async fn health_check_test() {
     // Given
-    spawn_app().await.expect("Failed to spawn the app.");
+    spawn_app();
     let client = reqwest::Client::new();
 
     // When
