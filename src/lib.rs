@@ -2,6 +2,7 @@ use std::net::TcpListener;
 
 use actix_web::{dev::Server, web, App, HttpRequest, HttpResponse, HttpServer};
 
+#[allow(dead_code)]
 #[derive(serde::Deserialize)]
 struct FormData {
     name: String,
