@@ -5,7 +5,7 @@ use actix_web::{dev::Server, web, App, HttpRequest, HttpResponse, HttpServer};
 #[derive(serde::Deserialize)]
 struct FormData {
     name: String,
-    email: String
+    email: String,
 }
 
 async fn health_check(_: HttpRequest) -> HttpResponse {
