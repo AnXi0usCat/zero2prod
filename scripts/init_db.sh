@@ -27,16 +27,21 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 DB_PORT="${POSTGRES_PORT:=5432}"
 # Check if a custom host has been set, otherwise default to 'localhost'
 DB_HOST="${POSTGRES_HOST:=localhost}"
+# skip docker init if the container is already running
+SKIP_DOCKER_FLAG="${SKIP_DOCKER:=false}"
 
-# Launch postgres using Docker
-docker run \
-    -e POSTGRES_USER=${DB_USER} \
-    -e POSTGRES_PASSWORD=${DB_PASSWORD} \
-    -e POSTGRES_DB=${DB_NAME} \
-    -p "${DB_PORT}":5432 \
-    -d \
-    --name "postgres_$(date '+%s')" \
-    postgres -N 1000
+
+if [ -z "${SKIP_DOCKER_FLAG}" ];  then
+    # Launch postgres using Docker
+    docker run \
+        -e POSTGRES_USER=${DB_USER} \
+        -e POSTGRES_PASSWORD=${DB_PASSWORD} \
+        -e POSTGRES_DB=${DB_NAME} \
+        -p "${DB_PORT}":5432 \
+        -d \
+        --name "postgres_$(date '+%s')" \
+        postgres -N 1000
+fi
 
 # keep pinging postgres until it is available
 export PGPASSWORD="${DB_PASSWORD}"
