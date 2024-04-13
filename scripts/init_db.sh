@@ -10,7 +10,7 @@ fi
 
 # sqlx is not installed
 if ! [ -x "$(command -v sqlx)" ];then
-    echo >&2 "Error, sqlisnot install"
+    echo >&2 "Error, sqlx is not install"
     echo >&2 "Use:"
     echo >&2 "cargo install --version='~0.7' sqlx-cli --no-default-features --features rustls,postgres"
     echo >&2 "to install it."
@@ -27,11 +27,9 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 DB_PORT="${POSTGRES_PORT:=5432}"
 # Check if a custom host has been set, otherwise default to 'localhost'
 DB_HOST="${POSTGRES_HOST:=localhost}"
-# skip docker init if the container is already running
-SKIP_DOCKER_FLAG="${SKIP_DOCKER:=false}"
 
 
-if [ -z "${SKIP_DOCKER_FLAG}" ];  then
+if [ -z "${SKIP_DOCKER}" ];  then
     # Launch postgres using Docker
     docker run \
         -e POSTGRES_USER=${DB_USER} \
@@ -47,6 +45,7 @@ fi
 export PGPASSWORD="${DB_PASSWORD}"
 until psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "postgres" -c '\q'; do
     >&2 echo "Postgres is still unavaialble - sleeping"
+    sleep 5
 done
 
 >&2 echo "Postgres is up and running on port: ${DB_PORT}"
