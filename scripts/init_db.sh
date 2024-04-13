@@ -22,3 +22,11 @@ docker run \
     -d \
     --name "postgres_$(date '+%s')" \
     postgres -N 1000
+
+# keep pinging postgres until it is available
+export PGPASSWORD="${DB_PASSWORD}"
+until psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "postgres" -c '\q'; do
+    >&2 echo "Postgres is still unavaialble - sleeping"
+done
+
+>&2 echo "Postgres is up and running on port: ${DB_PORT}"
