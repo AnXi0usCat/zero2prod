@@ -1,8 +1,8 @@
 -- create subscriptions table
 CREATE TABLE subscriptions(
-    id               UUID       NOT NULL,
+    id               UUID        NOT NULL,
     PRIMARY KEY (id),
-    email            TEXT       NOT NULL UNIQUE,
-    name             TEXT       NOT NULL,
-    subscribed_at    TIMESTAMPZ NOT NULL 
+    email            TEXT        NOT NULL UNIQUE,
+    name             TEXT        NOT NULL,
+    subscribed_at    TIMESTAMPTZ NOT NULL 
 );
