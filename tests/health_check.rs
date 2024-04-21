@@ -1,6 +1,7 @@
 use reqwest::StatusCode;
+use sqlx::{Connection, PgConnection};
 use std::net::TcpListener;
-use zero2prod::startup::run;
+use zero2prod::{configuration::get_configuration, startup::run};
 
 fn spawn_app() -> String {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
@@ -34,8 +35,15 @@ async fn health_check_returns_200() {
 async fn subscrine_returns_200_for_valid_form_data() {
     // Given
     let address = spawn_app();
+    // get postgres config
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_string = configuration.database.connection_string();
+    let mut connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres");
+
     let client = reqwest::Client::new();
-    let data = "name=meow%20purf&email=meow_purf%40@gmail.com";
+    let data = "name=meow%20purf&email=meow_purf%40gmail.com";
 
     // When
     let response = client
@@ -47,7 +55,15 @@ async fn subscrine_returns_200_for_valid_form_data() {
         .expect("Failed to execute request.");
 
     // Then
-    assert_eq!(StatusCode::OK, response.status())
+    // test postgres
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+        .fetch_one(&mut connection)
+        .await
+        .expect("Failed to fetch failed subscription.");
+
+    assert_eq!(StatusCode::OK, response.status());
+    assert_eq!(saved.email, "meow_purf@gmail.com");
+    assert_eq!(saved.name, "meow purf");
 }
 
 #[tokio::test]
