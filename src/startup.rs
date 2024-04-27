@@ -7,7 +7,6 @@ use crate::routes::health_check;
 use crate::routes::subscribe;
 
 pub fn run(listener: TcpListener, pool: PgPool) -> Result<Server, std::io::Error> {
-
     let pool = web::Data::new(pool);
     let server = HttpServer::new(move || {
         App::new()
