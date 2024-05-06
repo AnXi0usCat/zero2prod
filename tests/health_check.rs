@@ -2,10 +2,10 @@ use reqwest::StatusCode;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
-use zero2prod::{
-    configuration::{get_configuration, DatabaseSettings},
-    startup::run,
-};
+use zero2prod::configuration::{get_configuration, DatabaseSettings};
+use zero2prod::startup::run;
+use zero2prod::telemetry::get_subscriber;
+use zero2prod::telemetry::init_subscriber;
 
 struct TestApp {
     pub address: String,
@@ -13,6 +13,10 @@ struct TestApp {
 }
 
 async fn spawn_app() -> TestApp {
+    // initialise logging
+    let subscriber = get_subscriber("zero2prod".into(), "info".into());
+    init_subscriber(subscriber);
+
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     // get the local port we bound to
     let port = listener.local_addr().unwrap().port();
